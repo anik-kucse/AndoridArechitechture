@@ -10,8 +10,9 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
-public class AddNewNoteActivity extends AppCompatActivity {
+public class AddEditNewNoteActivity extends AppCompatActivity {
 
+    public static final String EXTRA_ID = "anik.cseku.andoridarechitechture.EXTRA_ID";
     public static final String EXTRA_TITLE = "anik.cseku.andoridarechitechture.EXTRA_TITLE";
     public static final String EXTRA_DESCRIPTION = "anik.cseku.andoridarechitechture.EXTRA_DESCRIPTION";
     public static final String  EXTRA_PRIORITY = "anik.cseku.andoridarechitechture.EXTRA_PRIORITY";
@@ -34,7 +35,19 @@ public class AddNewNoteActivity extends AppCompatActivity {
         numberPickerPriority.setMinValue(1);
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        setTitle("Add Note");
+
+        Intent intent = getIntent();
+
+
+
+        if(intent.hasExtra(EXTRA_ID)){
+            setTitle("Edit Note");
+            editTextTitle.setText(intent.getStringExtra(EXTRA_TITLE));
+            editTextDescription.setText(intent.getStringExtra(EXTRA_DESCRIPTION));
+            numberPickerPriority.setValue(intent.getIntExtra(EXTRA_PRIORITY, 1));
+        }else{
+            setTitle("Add Note");
+        }
         setTheme(R.style.AppTheme);
 
 
@@ -54,6 +67,11 @@ public class AddNewNoteActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_TITLE, title);
         intent.putExtra(EXTRA_DESCRIPTION, description);
         intent.putExtra(EXTRA_PRIORITY, priority);
+
+        int id = getIntent().getIntExtra(EXTRA_ID, -1);
+        if(id != -1){
+            intent.putExtra(EXTRA_ID, id);
+        }
 
         setResult(RESULT_OK, intent);
         finish();

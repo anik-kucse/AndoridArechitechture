@@ -12,21 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewModel> {
-
-//    private Context context;
-//    private List<Note> allNotes;
-
     private List<Note> allNotes = new ArrayList<>();
-
-//    public RecyclerViewAdapter(Context context) {
-//        this.context = context;
-//        allNotes = new ArrayList<>();
-//    }
+    private OnItemClickListener listener;
 
     @NonNull
     @Override
     public MyViewModel onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-//        View view = LayoutInflater.from(context).inflate(R.layout.list_elements, viewGroup, false);
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_elements, viewGroup, false);
         return new MyViewModel(view);
     }
@@ -63,6 +54,24 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             title = itemView.findViewById(R.id.text_view_title);
             priority = itemView.findViewById(R.id.text_view_priority);
             description = itemView.findViewById(R.id.text_view_description);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if(listener != null && position != RecyclerView.NO_POSITION){
+                        listener.onItemClick(allNotes.get(position));
+                    }
+                }
+            });
         }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(Note note);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener){
+        this.listener = listener;
     }
 }

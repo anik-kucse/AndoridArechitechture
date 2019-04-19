@@ -20,7 +20,7 @@ import android.widget.Toast;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+    public static final int EDIT_NOTE_REQUEST = 2;
     public static final int ADD_NOTE_REQUEST = 1;
 
     private NoteViewModel noteViewModel;
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, AddNewNoteActivity.class);
+                Intent intent = new Intent(MainActivity.this, AddEditNewNoteActivity.class);
                 startActivityForResult(intent, ADD_NOTE_REQUEST);
             }
         });
@@ -52,10 +52,7 @@ public class MainActivity extends AppCompatActivity {
         noteViewModel.getAllNotes().observe(this, new Observer<List<Note>>() {
             @Override
             public void onChanged(@Nullable List<Note> notes) {
-                // TODO: repopulated recycler view from here, when data changed.
-
                 recyclerViewAdapter.setNotes(notes);
-//                Toast.makeText(MainActivity.this, "livedata on create", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -72,6 +69,21 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Note deleted", Toast.LENGTH_SHORT).show();
             }
         }).attachToRecyclerView(recyclerView);
+
+        recyclerViewAdapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Note note) {
+                Intent intent = new Intent(MainActivity.this, AddEditNewNoteActivity.class);
+
+                int id = note.getId();
+
+                intent.putExtra(AddEditNewNoteActivity.EXTRA_ID, id);
+                intent.putExtra(AddEditNewNoteActivity.EXTRA_TITLE, note.getTitle());
+                intent.putExtra(AddEditNewNoteActivity.EXTRA_DESCRIPTION, note.getDescription());
+                intent.putExtra(AddEditNewNoteActivity.EXTRA_PRIORITY, note.getPriority());
+                startActivityForResult(intent, EDIT_NOTE_REQUEST);
+            }
+        });
     }
 
     @Override
@@ -79,14 +91,31 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(ADD_NOTE_REQUEST == requestCode && resultCode == RESULT_OK){
-            String title = data.getStringExtra(AddNewNoteActivity.EXTRA_TITLE);
-            String description  = data.getStringExtra(AddNewNoteActivity.EXTRA_DESCRIPTION);
-            int priority = data.getIntExtra(AddNewNoteActivity.EXTRA_PRIORITY, 1);
+            String title = data.getStringExtra(AddEditNewNoteActivity.EXTRA_TITLE);
+            String description  = data.getStringExtra(AddEditNewNoteActivity.EXTRA_DESCRIPTION);
+            int priority = data.getIntExtra(AddEditNewNoteActivity.EXTRA_PRIORITY, 1);
 
             Note note = new Note(title, description, priority);
             noteViewModel.insert(note);
             Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show();
-        }else{
+        }else if(EDIT_NOTE_REQUEST == requestCode && resultCode == RESULT_OK){
+            int id = data.getIntExtra(AddEditNewNoteActivity.EXTRA_ID, -1);
+
+            if(id == -1){
+                Toast.makeText(this, "Note Can't be saved :(", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String title = data.getStringExtra(AddEditNewNoteActivity.EXTRA_TITLE);
+            String description  = data.getStringExtra(AddEditNewNoteActivity.EXTRA_DESCRIPTION);
+            int priority = data.getIntExtra(AddEditNewNoteActivity.EXTRA_PRIORITY, 1);
+
+            Note note = new Note(title, description, priority);
+            note.setId(id);
+            noteViewModel.update(note);
+            Toast.makeText(this, "Note updated", Toast.LENGTH_SHORT).show();
+
+        } else{
             Toast.makeText(this, "Note not saved", Toast.LENGTH_SHORT).show();
         }
     }
