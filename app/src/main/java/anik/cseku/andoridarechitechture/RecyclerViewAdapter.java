@@ -1,17 +1,13 @@
 package anik.cseku.andoridarechitechture;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.recyclerview.extensions.ListAdapter;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RecyclerViewAdapter extends ListAdapter<Note, RecyclerViewAdapter.MyViewModel> {
     private OnItemClickListener listener;
